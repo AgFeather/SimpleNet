@@ -80,7 +80,6 @@ namespace liu
     
     // 前向传播
     void Net::forward() {
-        std::cout<<"forward"<<std::endl;
         for (int i = 0; i < layer_neuron_num.size() - 1; ++i) {
             cv::Mat product = weights[i] * layer[i] + bias[i];
             layer[i + 1] = activationFunction(product, activation_function);
@@ -104,14 +103,12 @@ namespace liu
             cv::Mat dx = derivativeFunction(layer[i + 1], activation_function);
             //Output layer delta error
             if (i == delta_err.size() - 1) {
-                std::cout<<"hhh"<<std::endl;
                 delta_err[i] = dx.mul(output_error);
             }
             else { //Hidden layer delta error
 //                cv::Mat weight = weights[i];
 //                cv::Mat weight_t = weights[i].t();
 //                cv::Mat delta_err_1 = delta_err[i];
-                std::cout<<"aaa"<<std::endl;
                 delta_err[i] = dx.mul((weights[i + 1]).t() * delta_err[i + 1]);
             }
         }
@@ -426,11 +423,12 @@ namespace liu
         cv::FileStorage fs;
         fs.open(filename, cv::FileStorage::READ);
         cv::Mat input_, target_;
+        if (!fs.isOpened()) {
+            std::cout<<"ERROR: file not open!"<<std::endl;
+        }
         fs["input"] >> input_;
         fs["target"] >> target_;
         fs.release();
-        std::cout<<input.size()<<std::endl;
-        std::cout<<input_.size()<<std::endl;
         input = input_(cv::Rect(start, 0, sample_num, input_.rows));
         label = target_(cv::Rect(start, 0, sample_num, target_.rows));
     }
@@ -448,8 +446,7 @@ namespace liu
             cv::Point pt1(50 + i * 2, (int)(548 - points[i]));
             cv::Point pt2(50 + i * 2 + 1, (int)(548 - points[i + 1]));
             cv::line(board, pt1, pt2, cv::Scalar(0, 0, 255), 2);
-            if (i >= 1000)
-            {
+            if (i >= 1000){
                 return;
             }
         }
