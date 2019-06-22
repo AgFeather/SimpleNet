@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		D6A68EB722BCFED9006F5F04 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6A68EB622BCFED9006F5F04 /* main.cpp */; };
+		D6A68EF622BD01AC006F5F04 /* libopencv_shape.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */; };
+		D6A68EF822BD01AC006F5F04 /* libopencv_imgproc.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EE622BD01AB006F5F04 /* libopencv_imgproc.3.4.6.dylib */; };
+		D6A68EF922BD01AC006F5F04 /* libopencv_imgcodecs.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EE722BD01AB006F5F04 /* libopencv_imgcodecs.3.4.6.dylib */; };
+		D6A68EFB22BD01AC006F5F04 /* libopencv_highgui.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EE922BD01AB006F5F04 /* libopencv_highgui.3.4.6.dylib */; };
+		D6A68F0322BD01AC006F5F04 /* libopencv_core.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EF122BD01AC006F5F04 /* libopencv_core.3.4.6.dylib */; };
+		D6A68F0822BD0333006F5F04 /* NeuralNet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6A68F0622BD0333006F5F04 /* NeuralNet.cpp */; };
+		D6A68F0B22BD03C7006F5F04 /* Mathematical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6A68F0922BD03C7006F5F04 /* Mathematical.cpp */; };
+		D6A68F0D22BD054B006F5F04 /* csv2xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6A68F0C22BD054B006F5F04 /* csv2xml.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,8 +31,19 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D61C031F22BE6C580043879E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D6A68EB322BCFED9006F5F04 /* SimpleNet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SimpleNet; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6A68EB622BCFED9006F5F04 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_shape.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_shape.3.4.6.dylib"; sourceTree = "<group>"; };
+		D6A68EE622BD01AB006F5F04 /* libopencv_imgproc.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgproc.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_imgproc.3.4.6.dylib"; sourceTree = "<group>"; };
+		D6A68EE722BD01AB006F5F04 /* libopencv_imgcodecs.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_imgcodecs.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_imgcodecs.3.4.6.dylib"; sourceTree = "<group>"; };
+		D6A68EE922BD01AB006F5F04 /* libopencv_highgui.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_highgui.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_highgui.3.4.6.dylib"; sourceTree = "<group>"; };
+		D6A68EF122BD01AC006F5F04 /* libopencv_core.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_core.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_core.3.4.6.dylib"; sourceTree = "<group>"; };
+		D6A68F0622BD0333006F5F04 /* NeuralNet.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NeuralNet.cpp; sourceTree = "<group>"; };
+		D6A68F0722BD0333006F5F04 /* NeuralNet.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NeuralNet.hpp; sourceTree = "<group>"; };
+		D6A68F0922BD03C7006F5F04 /* Mathematical.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Mathematical.cpp; sourceTree = "<group>"; };
+		D6A68F0A22BD03C7006F5F04 /* Mathematical.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Mathematical.hpp; sourceTree = "<group>"; };
+		D6A68F0C22BD054B006F5F04 /* csv2xml.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = csv2xml.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +51,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D6A68EF922BD01AC006F5F04 /* libopencv_imgcodecs.3.4.6.dylib in Frameworks */,
+				D6A68EF822BD01AC006F5F04 /* libopencv_imgproc.3.4.6.dylib in Frameworks */,
+				D6A68EF622BD01AC006F5F04 /* libopencv_shape.3.4.6.dylib in Frameworks */,
+				D6A68F0322BD01AC006F5F04 /* libopencv_core.3.4.6.dylib in Frameworks */,
+				D6A68EFB22BD01AC006F5F04 /* libopencv_highgui.3.4.6.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +65,17 @@
 		D6A68EAA22BCFED9006F5F04 = {
 			isa = PBXGroup;
 			children = (
+				D61C031F22BE6C580043879E /* README.md */,
+				D6A68F0C22BD054B006F5F04 /* csv2xml.cpp */,
+				D6A68F0922BD03C7006F5F04 /* Mathematical.cpp */,
+				D6A68F0A22BD03C7006F5F04 /* Mathematical.hpp */,
+				D6A68F0622BD0333006F5F04 /* NeuralNet.cpp */,
+				D6A68F0722BD0333006F5F04 /* NeuralNet.hpp */,
+				D6A68EF122BD01AC006F5F04 /* libopencv_core.3.4.6.dylib */,
+				D6A68EE922BD01AB006F5F04 /* libopencv_highgui.3.4.6.dylib */,
+				D6A68EE722BD01AB006F5F04 /* libopencv_imgcodecs.3.4.6.dylib */,
+				D6A68EE622BD01AB006F5F04 /* libopencv_imgproc.3.4.6.dylib */,
+				D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */,
 				D6A68EB522BCFED9006F5F04 /* SimpleNet */,
 				D6A68EB422BCFED9006F5F04 /* Products */,
 			);
@@ -118,7 +153,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D6A68F0B22BD03C7006F5F04 /* Mathematical.cpp in Sources */,
+				D6A68F0822BD0333006F5F04 /* NeuralNet.cpp in Sources */,
 				D6A68EB722BCFED9006F5F04 /* main.cpp in Sources */,
+				D6A68F0D22BD054B006F5F04 /* csv2xml.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,7 +277,11 @@
 		D6A68EBB22BCFED9006F5F04 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = /usr/local/lib;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = "/Users/dongfang/opencv/opencv-3.4.6/build/lib";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -247,7 +289,11 @@
 		D6A68EBC22BCFED9006F5F04 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				CODE_SIGN_STYLE = Automatic;
+				FRAMEWORK_SEARCH_PATHS = /usr/local/lib;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = "/Users/dongfang/opencv/opencv-3.4.6/build/lib";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
