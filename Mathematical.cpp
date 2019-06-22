@@ -48,51 +48,44 @@ namespace liu
         return fx;
     }
     
-    //Derivative function
-    cv::Mat derivativeFunction(cv::Mat& fx, std::string func_type)
-    {
+    // 求导
+    cv::Mat derivativeFunction(cv::Mat& fx, std::string func_type) {
         cv::Mat dx;
-        if (func_type == "sigmoid")
-        {
+        if (func_type == "sigmoid") {
             dx = sigmoid(fx).mul((1 - sigmoid(fx)));
         }
-        if (func_type == "tanh")
-        {
+        else if (func_type == "tanh") {
             cv::Mat tanh_2;
             pow(tanh(fx), 2., tanh_2);
             dx = 1 - tanh_2;
         }
-        if (func_type == "ReLU")
-        {
+        else if (func_type == "ReLU") {
             dx = fx;
-            for (int i = 0; i < fx.rows; i++)
-            {
-                for (int j = 0; j < fx.cols; j++)
-                {
-                    if (fx.at<float>(i, j) > 0)
-                    {
+            for (int i = 0; i < fx.rows; i++) {
+                for (int j = 0; j < fx.cols; j++) {
+                    if (fx.at<float>(i, j) > 0) {
                         dx.at<float>(i, j) = 1;
                     }
                 }
             }
         }
+        else {
+            throw "unknown activation function";
+        }
         return dx;
     }
     
-    //Objective function
-    void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss)
-    {
-        if (target.empty())
-        {
+    // 根据网络输出output和预测目标target计算loss
+    void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss) {
+        if (target.empty()) {
             std::cout << "Can't find the target cv::Matrix" << std::endl;
             return;
         }
-        output_error = target - output;
+        output_error = target - output; // ?? 应该是减反了
         cv::Mat err_sqrare;
         pow(output_error, 2., err_sqrare);
         cv::Scalar err_sqr_sum = sum(err_sqrare);
         loss = err_sqr_sum[0] / (float)(output.rows);
     }
-    
     
 }

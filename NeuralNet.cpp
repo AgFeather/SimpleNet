@@ -11,21 +11,20 @@
 namespace liu
 {
     //Activation function
-    cv::Mat Net::activationFunction(cv::Mat &x, std::string func_type)
-    {
+    cv::Mat Net::activationFunction(cv::Mat &x, std::string func_type) {
         activation_function = func_type;
         cv::Mat fx;
-        if (func_type == "sigmoid")
-        {
+        if (func_type == "sigmoid"){
             fx = sigmoid(x);
         }
-        if (func_type == "tanh")
-        {
+        else if (func_type == "tanh"){
             fx = tanh(x);
         }
-        if (func_type == "ReLU")
-        {
+        else if (func_type == "ReLU"){
             fx = ReLU(x);
+        }
+        else{
+            throw "error";
         }
         return fx;
     }
@@ -81,42 +80,46 @@ namespace liu
     
     // 前向传播
     void Net::forward() {
+        std::cout<<"forward"<<std::endl;
         for (int i = 0; i < layer_neuron_num.size() - 1; ++i) {
             cv::Mat product = weights[i] * layer[i] + bias[i];
             layer[i + 1] = activationFunction(product, activation_function);
         }
+        // 根据nn的output和target计算loss，目前使用square损失
         calcLoss(layer[layer.size() - 1], target, output_error, loss);
     }
     
-    //Compute delta error
-    void Net::deltaError()
-    {
+    // 进行反向传播
+    void Net::backward() {
+        deltaError();
+        updateWeights();
+    }
+    
+    //计算 delta error
+    void Net::deltaError() {
         delta_err.resize(layer.size() - 1);
-        for (int i = delta_err.size() - 1; i >= 0; i--)
-        {
+        for (int i = (int)delta_err.size() - 1; i >= 0; i--) {
             delta_err[i].create(layer[i + 1].size(), layer[i + 1].type());
             //cv::Mat dx = layer[i+1].mul(1 - layer[i+1]);
             cv::Mat dx = derivativeFunction(layer[i + 1], activation_function);
             //Output layer delta error
-            if (i == delta_err.size() - 1)
-            {
+            if (i == delta_err.size() - 1) {
+                std::cout<<"hhh"<<std::endl;
                 delta_err[i] = dx.mul(output_error);
             }
-            else  //Hidden layer delta error
-            {
-                cv::Mat weight = weights[i];
-                cv::Mat weight_t = weights[i].t();
-                cv::Mat delta_err_1 = delta_err[i];
+            else { //Hidden layer delta error
+//                cv::Mat weight = weights[i];
+//                cv::Mat weight_t = weights[i].t();
+//                cv::Mat delta_err_1 = delta_err[i];
+                std::cout<<"aaa"<<std::endl;
                 delta_err[i] = dx.mul((weights[i + 1]).t() * delta_err[i + 1]);
             }
         }
     }
     
     //Update weights
-    void Net::updateWeights()
-    {
-        for (int i = 0; i < weights.size(); ++i)
-        {
+    void Net::updateWeights() {
+        for (int i = 0; i < weights.size(); ++i) {
             cv::Mat delta_weights = learning_rate * (delta_err[i] * layer[i].t());
             cv::Mat delta_bias = learning_rate*delta_err[i];
             weights[i] = weights[i] + delta_weights;
@@ -124,14 +127,7 @@ namespace liu
         }
     }
     
-    //Forward
-    void Net::backward()
-    {
-        //move this function to the end of the forward().
-        //calcLoss(layer[layer.size() - 1], target, output_error, loss);
-        deltaError();
-        updateWeights();
-    }
+
     
     //Train,use accuracy_threshold
     void Net::train(cv::Mat input, cv::Mat target_, float accuracy_threshold)
@@ -426,14 +422,15 @@ namespace liu
     }
     
     //Get sample_number samples in XML file,from the start column.
-    void get_input_label(std::string filename, cv::Mat& input, cv::Mat& label, int sample_num, int start)
-    {
+    void get_input_label(std::string filename, cv::Mat& input, cv::Mat& label, int sample_num, int start) {
         cv::FileStorage fs;
         fs.open(filename, cv::FileStorage::READ);
         cv::Mat input_, target_;
         fs["input"] >> input_;
         fs["target"] >> target_;
         fs.release();
+        std::cout<<input.size()<<std::endl;
+        std::cout<<input_.size()<<std::endl;
         input = input_(cv::Rect(start, 0, sample_num, input_.rows));
         label = target_(cv::Rect(start, 0, sample_num, target_.rows));
     }
