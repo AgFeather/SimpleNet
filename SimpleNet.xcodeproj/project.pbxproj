@@ -32,6 +32,7 @@
 
 /* Begin PBXFileReference section */
 		D61C031F22BE6C580043879E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		D61C033922BE7E940043879E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
 		D6A68EB322BCFED9006F5F04 /* SimpleNet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SimpleNet; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6A68EB622BCFED9006F5F04 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_shape.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_shape.3.4.6.dylib"; sourceTree = "<group>"; };
@@ -65,6 +66,7 @@
 		D6A68EAA22BCFED9006F5F04 = {
 			isa = PBXGroup;
 			children = (
+				D6A68EB622BCFED9006F5F04 /* main.cpp */,
 				D61C031F22BE6C580043879E /* README.md */,
 				D6A68F0C22BD054B006F5F04 /* csv2xml.cpp */,
 				D6A68F0922BD03C7006F5F04 /* Mathematical.cpp */,
@@ -76,8 +78,8 @@
 				D6A68EE722BD01AB006F5F04 /* libopencv_imgcodecs.3.4.6.dylib */,
 				D6A68EE622BD01AB006F5F04 /* libopencv_imgproc.3.4.6.dylib */,
 				D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */,
-				D6A68EB522BCFED9006F5F04 /* SimpleNet */,
 				D6A68EB422BCFED9006F5F04 /* Products */,
+				D61C033922BE7E940043879E /* data */,
 			);
 			sourceTree = "<group>";
 		};
@@ -87,14 +89,6 @@
 				D6A68EB322BCFED9006F5F04 /* SimpleNet */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		D6A68EB522BCFED9006F5F04 /* SimpleNet */ = {
-			isa = PBXGroup;
-			children = (
-				D6A68EB622BCFED9006F5F04 /* main.cpp */,
-			);
-			path = SimpleNet;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

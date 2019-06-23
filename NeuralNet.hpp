@@ -19,9 +19,10 @@
 
 
 
-namespace liu {
+namespace dongfang {
     
     class Net {
+        
     public:
         std::vector<int> layer_neuron_num; // 每一层神经网络的神经元数目
         std::string activation_function = "sigmoid"; // 激活函数
@@ -45,23 +46,21 @@ namespace liu {
     public:
         Net() {};
         ~Net() {};
-        
         // 初始化整个神经网络，输入一个vector，表示每一层的神经元个数
         void initNet(std::vector<int> layer_neuron_num_);
-        
         // 初始化权重list
         void initWeights(int type = 0, double a = 0., double b = 0.1);
-        
         // 初始化bias list
         void initBias(cv::Scalar bias);
-        
         // 前向传播
-        void forward();
-        
+        void forwardPropagation();
         // 反向传播
-        void backward();
-        
-        //Train,use accuracy_threshold
+        void backwardPropagation();
+        // 计算每一层的delta error
+        void calcDeltaError();
+        // 更新weight和bias
+        void updateParameters();
+        // 训练模型，使用准确率作为阈值
         void train(cv::Mat input, cv::Mat target, float accuracy_threshold);
         
         //Train,use loss_threshold
@@ -82,18 +81,9 @@ namespace liu {
         //Load model;
         void load(std::string filename);
         
-    protected:
-        // 为输入的mat进行赋值一个随机数
-        void getRandom(cv::Mat &dst, int type, double a, double b);
-        
         //Activation function
-        cv::Mat activationFunction(cv::Mat &x, std::string func_type);
-        
-        //Compute delta error
-        void deltaError();
-        
-        //Update weights
-        void updateWeights();
+        cv::Mat activationFunction(cv::Mat &x, std::string func_type); 
+
     };
     
     //Get sample_number samples in XML file,from the start column.

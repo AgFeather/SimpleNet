@@ -2,7 +2,7 @@
 
 using namespace std;
 using namespace cv;
-using namespace liu;
+using namespace dongfang;
 
 int main(int argc, char *argv[])
 {
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 //    //Save the model
 //    net.save("models/model_ReLU_800_200.xml");
 //
-    getchar();
+    //getchar();
     return 0;
     
 }

@@ -15,7 +15,7 @@
 #include<opencv2/core/core.hpp>
 #include<iostream>
 
-namespace liu
+namespace dongfang
 {
     
     //sigmoid function
@@ -33,7 +33,8 @@ namespace liu
     //Objective function
     void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss);
     
-    
+    //initialise the weights cv::Matrix.if type =0,Gaussian.else uniform.
+    void getRandom(cv::Mat &dst, int type, double a, double b);
 }
 
 

@@ -8,7 +8,7 @@
 
 #include "NeuralNet.hpp"
 
-namespace liu
+namespace dongfang
 {
     //Activation function
     cv::Mat Net::activationFunction(cv::Mat &x, std::string func_type) {
@@ -48,20 +48,16 @@ namespace liu
             bias[i] = cv::Mat::zeros(layer[i + 1].rows, 1, CV_32FC1);
         }
         
+        // 对各层delta error的形状进行初始化
+        delta_err.resize(layer.size() - 1);
+        for (int i = 0; i < delta_err.size(); i++) {
+            delta_err[i].create(layer[i + 1].size(), layer[i + 1].type());
+        }
+        
         // 对weight和bias的值进行初始化
         initWeights(0, 0., 0.01);
         initBias(cv::Scalar(0.05));
         std::cout << "initialized weights matrices and bias!" << std::endl;
-    }
-    
-    //initialise the weights cv::Matrix.if type =0,Gaussian.else uniform.
-    void Net::getRandom(cv::Mat &dst, int type, double a, double b) {
-        if (type == 0) {
-            randn(dst, a, b);
-        }
-        else {
-            randu(dst, a, b);
-        }
     }
     
     // 用随机值初始化weight
@@ -79,7 +75,7 @@ namespace liu
     }
     
     // 前向传播
-    void Net::forward() {
+    void Net::forwardPropagation() {
         for (int i = 0; i < layer_neuron_num.size() - 1; ++i) {
             cv::Mat product = weights[i] * layer[i] + bias[i];
             layer[i + 1] = activationFunction(product, activation_function);
@@ -89,210 +85,149 @@ namespace liu
     }
     
     // 进行反向传播
-    void Net::backward() {
-        deltaError();
-        updateWeights();
+    void Net::backwardPropagation() {
+        calcDeltaError();
+        updateParameters();
     }
     
-    //计算 delta error
-    void Net::deltaError() {
-        delta_err.resize(layer.size() - 1);
-        for (int i = (int)delta_err.size() - 1; i >= 0; i--) {
-            delta_err[i].create(layer[i + 1].size(), layer[i + 1].type());
-            //cv::Mat dx = layer[i+1].mul(1 - layer[i+1]);
-            cv::Mat dx = derivativeFunction(layer[i + 1], activation_function);
-            //Output layer delta error
-            if (i == delta_err.size() - 1) {
+    //计算 每一层每一个节点对应的delta error
+    void Net::calcDeltaError() {
+        for (int i = (int)delta_err.size() - 1; i >= 0; i--) { // 从输出层开始更新error
+            cv::Mat dx = derivativeFunction(layer[i + 1], activation_function); // 对激活函数求偏导
+            if (i == delta_err.size() - 1) { // 更新输出层的delta error
                 delta_err[i] = dx.mul(output_error);
             }
-            else { //Hidden layer delta error
-//                cv::Mat weight = weights[i];
-//                cv::Mat weight_t = weights[i].t();
-//                cv::Mat delta_err_1 = delta_err[i];
+            else { // 更新隐藏层的delta error
                 delta_err[i] = dx.mul((weights[i + 1]).t() * delta_err[i + 1]);
             }
         }
     }
     
-    //Update weights
-    void Net::updateWeights() {
+    // 更新weight和bias
+    void Net::updateParameters() {
         for (int i = 0; i < weights.size(); ++i) {
-            cv::Mat delta_weights = learning_rate * (delta_err[i] * layer[i].t());
-            cv::Mat delta_bias = learning_rate*delta_err[i];
-            weights[i] = weights[i] + delta_weights;
-            bias[i] = bias[i] + delta_bias;
+            weights[i] = weights[i] + learning_rate * (delta_err[i] * layer[i].t());
+            bias[i] = bias[i] + learning_rate * delta_err[i];
         }
     }
     
-
-    
-    //Train,use accuracy_threshold
-    void Net::train(cv::Mat input, cv::Mat target_, float accuracy_threshold)
-    {
-        if (input.empty())
-        {
+    // 训练模型，使用accuracy作为阈值
+    void Net::train(cv::Mat input, cv::Mat target_, float accuracy_threshold) {
+        if (input.empty()) {
             std::cout << "Input is empty!" << std::endl;
             return;
         }
+        std::cout << "Training begin!" << std::endl;
         
-        std::cout << "Train,begin!" << std::endl;
-        
-        cv::Mat sample;
-        if (input.rows == (layer[0].rows) && input.cols == 1)
-        {
-            target = target_;
-            sample = input;
-            layer[0] = sample;
-            forward();
-            //backward();
-            int num_of_train = 0;
-            while (accuracy < accuracy_threshold)
-            {
-                backward();
-                forward();
-                num_of_train++;
-                if (num_of_train % 500 == 0)
-                {
-                    std::cout << "Train " << num_of_train << " times" << std::endl;
-                    std::cout << "Loss: " << loss << std::endl;
+        if (input.rows == (layer[0].rows) && input.cols == 1) { // 输入只有一个训练样本
+            this->target = target_;
+            layer[0] = input;
+            forwardPropagation();
+            int global_step = 0;
+            while (accuracy < accuracy_threshold) {
+                backwardPropagation();
+                forwardPropagation();
+                global_step++;
+                if (global_step % 500 == 0) {
+                    std::cout << "Training step:" << global_step <<"Loss:"<<loss<< std::endl;
                 }
             }
-            std::cout << std::endl << "Train " << num_of_train << " times" << std::endl;
+            
+            std::cout << std::endl << "Train " << global_step << " times" << std::endl;
             std::cout << "Loss: " << loss << std::endl;
             std::cout << "Train sucessfully!" << std::endl;
         }
-        else if (input.rows == (layer[0].rows) && input.cols > 1)
-        {
-            double batch_loss = 0.;
+        
+        else if (input.rows == (layer[0].rows) && input.cols > 1) { // 有多个训练样本输入
+            double epoch_loss = 0.;
             int epoch = 0;
-            while (accuracy < accuracy_threshold)
-            {
-                batch_loss = 0.;
-                for (int i = 0; i < input.cols; ++i)
-                {
-                    target = target_.col(i);
-                    sample = input.col(i);
-                    
-                    layer[0] = sample;
-                    forward();
-                    batch_loss += loss;
-                    backward();
+            while (accuracy < accuracy_threshold) {
+                epoch_loss = 0.;
+                for (int i = 0; i < input.cols; ++i) { // 每次取一个样本feed到网络中，进行更新
+                    this->target = target_.col(i);
+                    layer[0] = input.col(i);
+                    forwardPropagation();
+                    epoch_loss += loss;
+                    backwardPropagation();
                 }
                 test(input, target_);
                 epoch++;
-                if (epoch % 10 == 0)
-                {
-                    std::cout << "Number of epoch: " << epoch << std::endl;
-                    std::cout << "Loss sum: " << batch_loss << std::endl;
+                if (epoch % 10 == 0) {
+                    std::cout << "Training epoch:" << epoch << " Loss:" << epoch_loss << std::endl;
                 }
-                //if (epoch % 100 == 0)
-                //{
-                //    learning_rate*= 1.01;
-                //}
             }
-            std::cout << std::endl << "Number of epoch: " << epoch << std::endl;
-            std::cout << "Loss sum: " << batch_loss << std::endl;
-            std::cout << "Train sucessfully!" << std::endl;
+            std::cout << "Train sucessfully! "<<"Total epoch:"<<epoch<<" Accuracy:"<<accuracy << std::endl;
         }
-        else
-        {
-            std::cout << "Rows of input don't cv::Match the number of input!" << std::endl;
+        
+        else { // 样本的大小不等于网络输入层的大小，报错
+            std::cout << "Rows of input don't cv::Match the size of input layer!" << std::endl;
         }
     }
     
-    //Train,use loss_threshold
-    void Net::train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve)
-    {
-        if (input.empty())
-        {
+    // 使用loss 作为阈值训练网络
+    void Net::train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve) {
+        if (input.empty()) {
             std::cout << "Input is empty!" << std::endl;
             return;
         }
+        std::cout << "Training begin!" << std::endl;
         
-        std::cout << "Train,begin!" << std::endl;
-        
-        cv::Mat sample;
-        if (input.rows == (layer[0].rows) && input.cols == 1)
-        {
+        if (input.rows == (layer[0].rows) && input.cols == 1) { // 训练集只有一个样本
             target = target_;
-            sample = input;
-            layer[0] = sample;
-            forward();
-            //backward();
-            int num_of_train = 0;
-            while (loss > loss_threshold)
-            {
-                backward();
-                forward();
-                num_of_train++;
-                if (num_of_train % 500 == 0)
-                {
-                    std::cout << "Train " << num_of_train << " times" << std::endl;
-                    std::cout << "Loss: " << loss << std::endl;
+            layer[0] = input;
+            forwardPropagation();
+            int global_step = 0;
+            while (loss > loss_threshold) {
+                backwardPropagation();
+                forwardPropagation();
+                global_step++;
+                if (global_step % 500 == 0) {
+                    std::cout << "Training step:" << global_step << " Loss:" << loss << std::endl;
                 }
             }
-            std::cout << std::endl << "Train " << num_of_train << " times" << std::endl;
-            std::cout << "Loss: " << loss << std::endl;
-            std::cout << "Train sucessfully!" << std::endl;
+            std::cout << "Train sucessfully! Training step:"<<global_step<<" LossL:"<<loss << std::endl;
         }
-        else if (input.rows == (layer[0].rows) && input.cols > 1)
-        {
-            double batch_loss = loss_threshold + 0.01;
+        else if (input.rows == (layer[0].rows) && input.cols > 1) { // 训练集有多个样本
+            double epoch_loss = loss_threshold + 0.01;
             int epoch = 0;
-            while (batch_loss > loss_threshold)
-            {
-                batch_loss = 0.;
-                for (int i = 0; i < input.cols; ++i)
-                {
+            while (epoch_loss > loss_threshold) {
+                double epoch_loss = 0.;
+                for (int i = 0; i < input.cols; ++i) {
                     target = target_.col(i);
-                    sample = input.col(i);
-                    layer[0] = sample;
-                    
-                    forward();
-                    backward();
-                    
-                    batch_loss += loss;
-                }
-                
-                loss_vec.push_back(batch_loss);
-                
-                if (loss_vec.size() >= 2 && draw_loss_curve)
-                {
-                    draw_curve(board, loss_vec);
+                    layer[0] = input.col(i);
+                    forwardPropagation();
+                    backwardPropagation();
+                    epoch_loss += loss;
                 }
                 epoch++;
-                if (epoch % output_interval == 0)
-                {
-                    std::cout << "Number of epoch: " << epoch << std::endl;
-                    std::cout << "Loss sum: " << batch_loss << std::endl;
+                if (epoch % output_interval == 0) {
+                    std::cout << "Training epoch:" << epoch << " Loss sum:" << epoch_loss << std::endl;
                 }
-                if (epoch % 100 == 0)
-                {
+                if (epoch % 100 == 0) {
                     learning_rate *= fine_tune_factor;
+                }
+                if (draw_loss_curve) {
+                    loss_vec.push_back(epoch_loss);
+                    draw_curve(board, loss_vec);
                 }
             }
             std::cout << std::endl << "Number of epoch: " << epoch << std::endl;
-            std::cout << "Loss sum: " << batch_loss << std::endl;
-            std::cout << "Train sucessfully!" << std::endl;
+            std::cout << "Train sucessfully! Training epoch:"<<epoch<<" Loss sum:"<<epoch_loss << std::endl;
         }
-        else
-        {
+        else { // 样本大小不等于网络输入层的大小
             std::cout << "Rows of input don't cv::Match the number of input!" << std::endl;
         }
     }
     
-    //Test
-    void Net::test(cv::Mat &input, cv::Mat &target_)
-    {
-        if (input.empty())
-        {
+    // 对已经训练完成的模型进行测试
+    void Net::test(cv::Mat &input, cv::Mat &target_) {
+        if (input.empty()) {
             std::cout << "Input is empty!" << std::endl;
             return;
         }
-        std::cout << std::endl << "Predict,begain!" << std::endl;
+        std::cout << std::endl << "Test begin!" << std::endl;
         
-        if (input.rows == (layer[0].rows) && input.cols == 1)
-        {
+        if (input.rows == (layer[0].rows) && input.cols == 1) { // 只有一个测试样本
             int predict_number = predict_one(input);
             
             cv::Point target_maxLoc;
@@ -338,18 +273,15 @@ namespace liu
     }
     
     //Predict
-    int Net::predict_one(cv::Mat &input)
-    {
-        if (input.empty())
-        {
+    int Net::predict_one(cv::Mat &input) {
+        if (input.empty()) {
             std::cout << "Input is empty!" << std::endl;
             return -1;
         }
         
-        if (input.rows == (layer[0].rows) && input.cols == 1)
-        {
+        if (input.rows == (layer[0].rows) && input.cols == 1) {
             layer[0] = input;
-            forward();
+            forwardPropagation();
             
             cv::Mat layer_out = layer[layer.size() - 1];
             cv::Point predict_maxLoc;
@@ -357,8 +289,7 @@ namespace liu
             minMaxLoc(layer_out, NULL, NULL, NULL, &predict_maxLoc, cv::noArray());
             return predict_maxLoc.y;
         }
-        else
-        {
+        else {
             std::cout << "Please give one sample alone and ensure input.rows = layer[0].rows" << std::endl;
             return -1;
         }

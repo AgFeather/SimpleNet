@@ -9,8 +9,19 @@
 #include "Mathematical.hpp"
 
 
-namespace liu
+namespace dongfang
 {
+    
+    //对一个Matrix用随机值进行初始化.if type =0,Gaussian.else uniform.
+    void getRandom(cv::Mat &dst, int type, double a, double b) {
+        if (type == 0) {
+            randn(dst, a, b);
+        }
+        else {
+            randu(dst, a, b);
+        }
+    }
+
     
     //sigmoid function
     cv::Mat sigmoid(cv::Mat &x)
@@ -81,7 +92,7 @@ namespace liu
             std::cout << "Can't find the target cv::Matrix" << std::endl;
             return;
         }
-        output_error = target - output; // ?? 应该是减反了
+        output_error = target - output;
         cv::Mat err_sqrare;
         pow(output_error, 2., err_sqrare);
         cv::Scalar err_sqr_sum = sum(err_sqrare);
@@ -89,3 +100,5 @@ namespace liu
     }
     
 }
+
+
