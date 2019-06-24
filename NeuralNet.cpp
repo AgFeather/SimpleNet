@@ -8,75 +8,51 @@
 
 #include "NeuralNet.hpp"
 
-namespace dongfang
-{
-    //Activation function
-    cv::Mat Net::activationFunction(cv::Mat &x, std::string func_type) {
-        activation_function = func_type;
-        cv::Mat fx;
-        if (func_type == "sigmoid"){
-            fx = sigmoid(x);
-        }
-        else if (func_type == "tanh"){
-            fx = tanh(x);
-        }
-        else if (func_type == "ReLU"){
-            fx = ReLU(x);
-        }
-        else{
-            throw "error";
-        }
-        return fx;
-    }
+namespace dongfang {
     
-    //Initialize net
-    void Net::initNet(std::vector<int> layer_neuron_num_) {
-        layer_neuron_num = layer_neuron_num_;
+    void Net::initNet(std::vector<int> num_units_each_layer_) {
+        num_units_each_layer = num_units_each_layer_;
+        num_layers = (int)num_units_each_layer_.size();
         // 对各个层进行初始化
-        layer.resize(layer_neuron_num.size());
+        layer.resize(num_layers);
         for (int i = 0; i < layer.size(); i++){
-            layer[i].create(layer_neuron_num[i], 1, CV_32FC1);
+            layer[i].create(num_units_each_layer[i], 1, CV_32FC1);
         }
-        std::cout << "initialized layers!" << std::endl;
+        std::cout << "Initialized layers!" << std::endl;
         
-        // 对weight list和bias list形状进行初始化
-        weights.resize(layer.size() - 1);
-        bias.resize(layer.size() - 1);
-        for (int i = 0; i < (layer.size() - 1); ++i){
-            weights[i].create(layer[i + 1].rows, layer[i].rows, CV_32FC1);
-            //bias[i].create(layer[i + 1].rows, 1, CV_32FC1);
-            bias[i] = cv::Mat::zeros(layer[i + 1].rows, 1, CV_32FC1);
-        }
-        
-        // 对各层delta error的形状进行初始化
-        delta_err.resize(layer.size() - 1);
-        for (int i = 0; i < delta_err.size(); i++) {
-            delta_err[i].create(layer[i + 1].size(), layer[i + 1].type());
+        // 对weight list，bias list和delta error list形状进行初始化
+        weights.resize(num_layers - 1);
+        bias.resize(num_layers - 1);
+        delta_err.resize(num_layers - 1);
+        for (int i = 0; i < num_layers - 1; i++){
+            weights[i].create(num_units_each_layer[i + 1], num_units_each_layer[i], CV_32FC1);
+            bias[i] = cv::Mat::zeros(num_units_each_layer[i + 1], 1, CV_32FC1);
+            delta_err[i].create(num_units_each_layer[i + 1], 1, CV_32FC1);
         }
         
         // 对weight和bias的值进行初始化
         initWeights(0, 0., 0.01);
-        initBias(cv::Scalar(0.05));
+        initBiases(cv::Scalar(0.05));
         std::cout << "initialized weights matrices and bias!" << std::endl;
     }
     
     // 用随机值初始化weight
     void Net::initWeights(int type, double a, double b) {
-        for (int i = 0; i < weights.size(); ++i) {
-            getRandom(weights[i], 0, 0., 0.1);
+        for (int i = 0; i < weights.size(); i++) {
+            getRandom(weights[i], 0., 0.1, "gaussian");
         }
     }
     
     // 初始化bias list
-    void Net::initBias(cv::Scalar bias_) {
+    void Net::initBiases(cv::Scalar bias_) {
         for (int i = 0; i < bias.size(); i++) {
             bias[i] = bias_;
         }
     }
-    
+    // mark: to be continue
     // 前向传播
     void Net::forwardPropagation() {
-        for (int i = 0; i < layer_neuron_num.size() - 1; ++i) {
+        for (int i = 0; i < num_units_each_layer.size() - 1; ++i) {
             cv::Mat product = weights[i] * layer[i] + bias[i];
             layer[i + 1] = activationFunction(product, activation_function);
         }
@@ -109,6 +85,25 @@ namespace dongfang
             weights[i] = weights[i] + learning_rate * (delta_err[i] * layer[i].t());
             bias[i] = bias[i] + learning_rate * delta_err[i];
         }
+    }
+    
+    //Activation function
+    cv::Mat Net::activationFunction(cv::Mat &x, std::string func_type) {
+        activation_function = func_type;
+        cv::Mat fx;
+        if (func_type == "sigmoid"){
+            fx = sigmoid(x);
+        }
+        else if (func_type == "tanh"){
+            fx = tanh(x);
+        }
+        else if (func_type == "ReLU"){
+            fx = ReLU(x);
+        }
+        else{
+            throw "error";
+        }
+        return fx;
     }
     
     // 训练模型，使用accuracy作为阈值
@@ -315,7 +310,7 @@ namespace dongfang
     void Net::save(std::string filename)
     {
         cv::FileStorage model(filename, cv::FileStorage::WRITE);
-        model << "layer_neuron_num" << layer_neuron_num;
+        model << "num_units_each_layer" << num_units_each_layer;
         model << "learning_rate" << learning_rate;
         model << "activation_function" << activation_function;
         
@@ -334,8 +329,8 @@ namespace dongfang
         fs.open(filename, cv::FileStorage::READ);
         cv::Mat input_, target_;
         
-        fs["layer_neuron_num"] >> layer_neuron_num;
-        initNet(layer_neuron_num);
+        fs["num_units_each_layer"] >> num_units_each_layer;
+        initNet(num_units_each_layer);
         
         for (int i = 0; i < weights.size(); i++)
         {

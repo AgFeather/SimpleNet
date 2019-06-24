@@ -9,11 +9,9 @@
 #ifndef Mathematical_hpp
 #define Mathematical_hpp
 
-#include <stdio.h>
-
-
-#include<opencv2/core/core.hpp>
 #include<iostream>
+#include<string>
+#include<opencv2/core/core.hpp>
 
 namespace dongfang
 {
@@ -34,7 +32,7 @@ namespace dongfang
     void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss);
     
     //initialise the weights cv::Matrix.if type =0,Gaussian.else uniform.
-    void getRandom(cv::Mat &dst, int type, double a, double b);
+    void getRandom(cv::Mat &dst, double begin, double end, std::string type);
 }
 
 

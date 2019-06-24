@@ -15,6 +15,8 @@
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
+#include<string>
+
 #include "Mathematical.hpp"
 
 
@@ -24,8 +26,9 @@ namespace dongfang {
     class Net {
         
     public:
-        std::vector<int> layer_neuron_num; // 每一层神经网络的神经元数目
+        std::vector<int> num_units_each_layer; // 每一层神经网络的神经元数目
         std::string activation_function = "sigmoid"; // 激活函数
+        int num_layers; // 整个神经网络的层数
         int output_interval = 10;
         float learning_rate;
         float accuracy = 0.;
@@ -51,7 +54,7 @@ namespace dongfang {
         // 初始化权重list
         void initWeights(int type = 0, double a = 0., double b = 0.1);
         // 初始化bias list
-        void initBias(cv::Scalar bias);
+        void initBiases(cv::Scalar bias);
         // 前向传播
         void forwardPropagation();
         // 反向传播

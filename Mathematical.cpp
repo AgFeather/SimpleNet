@@ -13,12 +13,12 @@ namespace dongfang
 {
     
     //对一个Matrix用随机值进行初始化.if type =0,Gaussian.else uniform.
-    void getRandom(cv::Mat &dst, int type, double a, double b) {
-        if (type == 0) {
-            randn(dst, a, b);
+    void getRandom(cv::Mat &dst, double begin, double end, std::string type="gaussian") {
+        if (type == "gaussian") {
+            randn(dst, begin, end);
         }
         else {
-            randu(dst, a, b);
+            randu(dst, begin, end);
         }
     }
 
