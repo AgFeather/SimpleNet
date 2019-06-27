@@ -83,10 +83,6 @@ namespace dongfang {
         
         //Load model;
         void load(std::string filename);
-        
-        //Activation function
-        cv::Mat activationFunction(cv::Mat &x, std::string func_type); 
-
     };
     
     //Get sample_number samples in XML file,from the start column.

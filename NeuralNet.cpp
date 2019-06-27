@@ -25,7 +25,7 @@ namespace dongfang {
         bias.resize(num_layers - 1);
         delta_err.resize(num_layers - 1);
         for (int i = 0; i < num_layers - 1; i++){
-            weights[i].create(num_units_each_layer[i + 1], num_units_each_layer[i], CV_32FC1);
+            weights[i].create(num_units_each_layer[i + 1], num_units_each_layer[i], CV_32FC1); // 注意每个weight的形状是相反的
             bias[i] = cv::Mat::zeros(num_units_each_layer[i + 1], 1, CV_32FC1);
             delta_err[i].create(num_units_each_layer[i + 1], 1, CV_32FC1);
         }
@@ -49,10 +49,10 @@ namespace dongfang {
             bias[i] = bias_;
         }
     }
-    // mark: to be continue
+    
     // 前向传播
     void Net::forwardPropagation() {
-        for (int i = 0; i < num_units_each_layer.size() - 1; ++i) {
+        for (int i = 0; i < num_layers - 1; ++i) {
             cv::Mat product = weights[i] * layer[i] + bias[i];
             layer[i + 1] = activationFunction(product, activation_function);
         }
@@ -87,25 +87,7 @@ namespace dongfang {
         }
     }
     
-    //Activation function
-    cv::Mat Net::activationFunction(cv::Mat &x, std::string func_type) {
-        activation_function = func_type;
-        cv::Mat fx;
-        if (func_type == "sigmoid"){
-            fx = sigmoid(x);
-        }
-        else if (func_type == "tanh"){
-            fx = tanh(x);
-        }
-        else if (func_type == "ReLU"){
-            fx = ReLU(x);
-        }
-        else{
-            throw "error";
-        }
-        return fx;
-    }
-    
+    // todo analysis
     // 训练模型，使用accuracy作为阈值
     void Net::train(cv::Mat input, cv::Mat target_, float accuracy_threshold) {
         if (input.empty()) {

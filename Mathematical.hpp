@@ -28,7 +28,10 @@ namespace dongfang
     //Derivative function
     cv::Mat derivativeFunction(cv::Mat& fx, std::string func_type);
     
-    //Objective function
+    // 激活函数
+    cv::Mat activationFunction(cv::Mat &x, std::string func_type);
+    
+    // Objective function
     void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss);
     
     //initialise the weights cv::Matrix.if type =0,Gaussian.else uniform.

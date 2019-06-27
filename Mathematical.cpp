@@ -22,6 +22,23 @@ namespace dongfang
         }
     }
 
+    //Activation function
+    cv::Mat activationFunction(cv::Mat &x, std::string func_type) {
+        cv::Mat fx;
+        if (func_type == "sigmoid"){
+            fx = sigmoid(x);
+        }
+        else if (func_type == "tanh"){
+            fx = tanh(x);
+        }
+        else if (func_type == "ReLU"){
+            fx = ReLU(x);
+        }
+        else{
+            throw "error";
+        }
+        return fx;
+    }
     
     //sigmoid function
     cv::Mat sigmoid(cv::Mat &x)
