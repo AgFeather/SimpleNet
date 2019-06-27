@@ -87,7 +87,6 @@ namespace dongfang {
         }
     }
     
-    // todo analysis
     // 训练模型，使用accuracy作为阈值
     void Net::train(cv::Mat input, cv::Mat target_, float accuracy_threshold) {
         if (input.empty()) {
@@ -95,27 +94,9 @@ namespace dongfang {
             return;
         }
         std::cout << "Training begin!" << std::endl;
+        double accuracy = 0.f;
         
-        if (input.rows == (layer[0].rows) && input.cols == 1) { // 输入只有一个训练样本
-            this->target = target_;
-            layer[0] = input;
-            forwardPropagation();
-            int global_step = 0;
-            while (accuracy < accuracy_threshold) {
-                backwardPropagation();
-                forwardPropagation();
-                global_step++;
-                if (global_step % 500 == 0) {
-                    std::cout << "Training step:" << global_step <<"Loss:"<<loss<< std::endl;
-                }
-            }
-            
-            std::cout << std::endl << "Train " << global_step << " times" << std::endl;
-            std::cout << "Loss: " << loss << std::endl;
-            std::cout << "Train sucessfully!" << std::endl;
-        }
-        
-        else if (input.rows == (layer[0].rows) && input.cols > 1) { // 有多个训练样本输入
+        if (input.rows == (layer[0].rows) && input.cols > 1) { // 训练
             double epoch_loss = 0.;
             int epoch = 0;
             while (accuracy < accuracy_threshold) {
@@ -149,29 +130,14 @@ namespace dongfang {
         }
         std::cout << "Training begin!" << std::endl;
         
-        if (input.rows == (layer[0].rows) && input.cols == 1) { // 训练集只有一个样本
-            target = target_;
-            layer[0] = input;
-            forwardPropagation();
-            int global_step = 0;
-            while (loss > loss_threshold) {
-                backwardPropagation();
-                forwardPropagation();
-                global_step++;
-                if (global_step % 500 == 0) {
-                    std::cout << "Training step:" << global_step << " Loss:" << loss << std::endl;
-                }
-            }
-            std::cout << "Train sucessfully! Training step:"<<global_step<<" LossL:"<<loss << std::endl;
-        }
-        else if (input.rows == (layer[0].rows) && input.cols > 1) { // 训练集有多个样本
+        if (input.rows == (layer[0].rows)) { // 训练
             double epoch_loss = loss_threshold + 0.01;
             int epoch = 0;
-            while (epoch_loss > loss_threshold) {
-                double epoch_loss = 0.;
-                for (int i = 0; i < input.cols; ++i) {
-                    target = target_.col(i);
+            while (epoch_loss >= loss_threshold) {
+                epoch_loss = 0.;
+                for (int i = 0; i < input.cols; i++) {
                     layer[0] = input.col(i);
+                    target = target_.col(i);
                     forwardPropagation();
                     backwardPropagation();
                     epoch_loss += loss;
@@ -188,7 +154,6 @@ namespace dongfang {
                     draw_curve(board, loss_vec);
                 }
             }
-            std::cout << std::endl << "Number of epoch: " << epoch << std::endl;
             std::cout << "Train sucessfully! Training epoch:"<<epoch<<" Loss sum:"<<epoch_loss << std::endl;
         }
         else { // 样本大小不等于网络输入层的大小
@@ -196,60 +161,71 @@ namespace dongfang {
         }
     }
     
-    // 对已经训练完成的模型进行测试
-    void Net::test(cv::Mat &input, cv::Mat &target_) {
+    void Net::train(cv::Mat input, cv::Mat target_, int num_epochs, bool draw_loss_curve){
+        int show_every_n = 3;
+        int global_step = 0;
         if (input.empty()) {
-            std::cout << "Input is empty!" << std::endl;
+            std::cout<<"ERROR: Training dataset is empty"<<std::endl;
             return;
         }
-        std::cout << std::endl << "Test begin!" << std::endl;
-        
-        if (input.rows == (layer[0].rows) && input.cols == 1) { // 只有一个测试样本
-            int predict_number = predict_one(input);
-            
-            cv::Point target_maxLoc;
-            minMaxLoc(target_, NULL, NULL, NULL, &target_maxLoc, cv::noArray());
-            int target_number = target_maxLoc.y;
-            
-            std::cout << "Predict: " << predict_number << std::endl;
-            std::cout << "Target:  " << target_number << std::endl;
-            std::cout << "Loss: " << loss << std::endl;
-        }
-        else if (input.rows == (layer[0].rows) && input.cols > 1)
-        {
-            double loss_sum = 0;
-            int right_num = 0;
-            cv::Mat sample;
-            for (int i = 0; i < input.cols; ++i)
-            {
-                sample = input.col(i);
-                int predict_number = predict_one(sample);
-                loss_sum += loss;
-                
+        for (int epoch = 1; epoch<=num_epochs; epoch++) {
+            double epoch_loss = 0.f;
+            for (int i = 0; i<input.cols; i++) {
+                layer[0] = input.col(i);
                 target = target_.col(i);
-                cv::Point target_maxLoc;
-                minMaxLoc(target, NULL, NULL, NULL, &target_maxLoc, cv::noArray());
-                int target_number = target_maxLoc.y;
-                
-                std::cout << "Test sample: " << i << "   " << "Predict: " << predict_number << std::endl;
-                std::cout << "Test sample: " << i << "   " << "Target:  " << target_number << std::endl << std::endl;
-                if (predict_number == target_number)
-                {
-                    right_num++;
-                }
+                forwardPropagation();
+                epoch_loss += loss;
+                backwardPropagation();
+                global_step++;
             }
-            accuracy = (double)right_num / input.cols;
-            std::cout << "Loss sum: " << loss_sum << std::endl;
-            std::cout << "accuracy: " << accuracy << std::endl;
+            if (epoch % show_every_n == 0) {
+                std::cout<<"Training epoch:"<<epoch<<" Global step:"<<global_step<<" Loss"<<epoch_loss<<std::endl;
+            }
+            if (draw_loss_curve) {
+                loss_vec.push_back(epoch_loss);
+                draw_curve(board, loss_vec);
+            }
         }
-        else
-        {
-            std::cout << "Rows of input don't cv::Match the number of input!" << std::endl;
-            return;
-        }
+        
     }
     
-    //Predict
+    // 对已经训练完成的模型进行测试并计算准确率
+    double Net::test(cv::Mat &input, cv::Mat &target_) {
+        if (input.empty()) {
+            std::cout << "Input is empty!" << std::endl;
+            return -1;
+        }
+        
+        std::cout << std::endl << "Test begin!" << std::endl;
+        int correct_count = 0;
+        double accuracy = 0.f;
+        cv::Mat sample;
+        if (input.rows == (layer[0].rows)) {
+            for (int i = 0; i < input.cols; i++) {
+                sample = input.col(i);
+                int predict_index = predict_one(sample);
+                
+                //target = target_.col(i);
+                cv::Point target_maxLoc;
+                minMaxLoc(target_.col(i), NULL, NULL, NULL, &target_maxLoc, cv::noArray());
+                int target_index = target_maxLoc.y;
+                
+                std::cout << "Test sample:" << i << " Predict:" << predict_index << " Target:" << target_index << std::endl;
+                if (predict_index == target_index) {
+                    correct_count++;
+                }
+            }
+            accuracy = (double)correct_count / input.cols;
+            std::cout << "accuracy: " << accuracy * 100<<"%" << std::endl;
+        }
+        
+        else {
+            std::cout << "Rows of input don't cv::Match the number of input!" << std::endl;
+        }
+        return accuracy;
+    }
+    
+    // 输入一个sample并进行预测
     int Net::predict_one(cv::Mat &input) {
         if (input.empty()) {
             std::cout << "Input is empty!" << std::endl;
@@ -259,27 +235,22 @@ namespace dongfang {
         if (input.rows == (layer[0].rows) && input.cols == 1) {
             layer[0] = input;
             forwardPropagation();
-            
             cv::Mat layer_out = layer[layer.size() - 1];
             cv::Point predict_maxLoc;
-            
             minMaxLoc(layer_out, NULL, NULL, NULL, &predict_maxLoc, cv::noArray());
             return predict_maxLoc.y;
         }
         else {
-            std::cout << "Please give one sample alone and ensure input.rows = layer[0].rows" << std::endl;
+            std::cout << "Please give one sample and ensure input.rows = layer[0].rows" << std::endl;
             return -1;
         }
     }
     
-    //Predict,more  than one samples
-    std::vector<int> Net::predict(cv::Mat &input)
-    {
+    // 对多个sample进行预测
+    std::vector<int> Net::predict(cv::Mat &input) {
         std::vector<int> predicted_labels;
-        if (input.rows == (layer[0].rows) && input.cols > 1)
-        {
-            for (int i = 0; i < input.cols; ++i)
-            {
+        if (input.rows == (layer[0].rows) && input.cols > 1) {
+            for (int i = 0; i < input.cols; ++i) {
                 cv::Mat sample = input.col(i);
                 int predicted_label = predict_one(sample);
                 predicted_labels.push_back(predicted_label);

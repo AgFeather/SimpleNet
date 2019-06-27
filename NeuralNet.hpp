@@ -31,7 +31,7 @@ namespace dongfang {
         int num_layers; // 整个神经网络的层数
         int output_interval = 10;
         float learning_rate;
-        float accuracy = 0.;
+        //float accuracy = 0.;
         std::vector<double> loss_vec;
         float fine_tune_factor = 1.01;
         
@@ -65,12 +65,13 @@ namespace dongfang {
         void updateParameters();
         // 训练模型，使用准确率作为阈值
         void train(cv::Mat input, cv::Mat target, float accuracy_threshold);
-        
-        //Train,use loss_threshold
+        // 训练模型，使用loss作为阈值
         void train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve = false);
+        // 训练模型，声明epochs
+        void train(cv::Mat input, cv::Mat target_, int num_epochs=50, bool draw_loss_curve=false);
         
         //Test
-        void test(cv::Mat &input, cv::Mat &target_);
+        double test(cv::Mat &input, cv::Mat &target_);
         
         //Predict,just one sample
         int predict_one(cv::Mat &input);

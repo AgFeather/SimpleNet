@@ -20,13 +20,17 @@ int main(int argc, char *argv[])
     get_input_label("data/input_label_1000.xml", test_input, test_label, 200, 800);
 
     //Set loss threshold,learning rate and activation function
-    float loss_threshold = 19;
+    float loss_threshold = 20.0;
     net.learning_rate = 0.002;
     net.output_interval = 2;
     net.activation_function = "ReLU";
 
-    //Train,and draw the loss curve(cause the last parameter is ture) and test the trained net
-    net.train(input, label, loss_threshold, true);
+    // 按照loss阈值对模型进行训练
+    //net.train(input, label, loss_threshold, false);
+    
+    // 根据epochs进行训练
+    net.train(input, label, 100, false);
+    
     net.test(test_input, test_label);
 
 //    //Save the model
