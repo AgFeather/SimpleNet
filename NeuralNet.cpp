@@ -57,14 +57,17 @@ namespace dongfang {
             cv::Mat product = weights[i] * layer[i] + bias[i];
             layer[i + 1] = activationFunction(product, activation_function);
         }
-        // 根据nn的output和target计算loss，目前使用square损失
-        calcLoss(layer[layer.size() - 1], target, output_error, loss);
     }
-    
+    void Net::computeLoss(){
+        // 根据nn的output和target计算loss，目前使用square损失
+        loss += calcLoss(layer[layer.size() - 1], target, output_error);
+        
+    }
     // 进行反向传播
     void Net::backwardPropagation() {
         calcDeltaError();
         updateParameters();
+        loss = 0.f;
     }
     
     //计算 每一层每一个节点对应的delta error
@@ -95,35 +98,39 @@ namespace dongfang {
             return;
         }
         std::cout << "Training begin!" << std::endl;
-        
-        if (input.rows == layer[0].rows) { // 训练
-            double epoch_loss = loss_threshold + 0.01;
-            int epoch = 0;
-            while (epoch_loss >= loss_threshold) {
-                epoch_loss = 0.;
-                for (int i = 0; i < input.cols; i++) {
-                    layer[0] = input.col(i);
-                    target = target_.col(i);
-                    forwardPropagation();
-                    backwardPropagation();
-                    epoch_loss += loss;
-                }
-                epoch++;
-                if (epoch % output_interval == 0) {
-                    std::cout << "Training epoch:" << epoch << " Loss sum:" << epoch_loss << std::endl;
-                }
-                if (epoch % 100 == 0) {
-                    learning_rate *= fine_tune_factor;
-                }
-                if (draw_loss_curve) {
-                    loss_vec.push_back(epoch_loss);
-                    draw_curve(board, loss_vec);
-                }
-            }
-            std::cout << "Train sucessfully! Training epoch:"<<epoch<<" Loss sum:"<<epoch_loss << std::endl;
-        }
-        else { // 样本大小不等于网络输入层的大小
+        if (input.rows != layer[0].rows) { // 样本大小不等于网络输入层的大小
             std::cout << "Rows of input don't cv::Match the number of input!" << std::endl;
+            return;
+        }
+        
+        double epoch_loss = loss_threshold + 0.01;
+        int epoch = 0;
+        while (true) {
+            epoch_loss = 0.;
+            for (int i = 0; i < input.cols; i++) {
+                layer[0] = input.col(i);
+                target = target_.col(i);
+                forwardPropagation();
+                computeLoss();
+                backwardPropagation();
+                epoch_loss += loss;
+            }
+            epoch++;
+            if (epoch % output_interval == 0) {
+                std::cout << "Training epoch:" << epoch << " Loss sum:" << epoch_loss << std::endl;
+            }
+            if (epoch % 100 == 0) {
+                learning_rate *= fine_tune_factor;
+            }
+            if (draw_loss_curve) {
+                loss_vec.push_back(epoch_loss);
+                draw_curve(board, loss_vec);
+            }
+            if (epoch_loss <= loss_threshold) {
+                std::cout << "Train sucessfully! Training epoch:"<<epoch<<" Loss sum:"<<epoch_loss << std::endl;
+                return;
+            }
+            
         }
     }
     
@@ -134,30 +141,58 @@ namespace dongfang {
             std::cout<<"ERROR: Training dataset is empty"<<std::endl;
             return;
         }
-        if (layer[0].rows == input.rows) {
-            for (int epoch = 1; epoch<=num_epochs; epoch++) {
-                double epoch_loss = 0.f;
-                for (int i = 0; i<input.cols; i++) {
-                    layer[0] = input.col(i);
-                    target = target_.col(i);
-                    forwardPropagation();
-                    epoch_loss += loss;
-                    backwardPropagation();
-                    global_step++;
-                }
-                if (epoch % show_every_n == 0) {
-                    std::cout<<"Training epoch:"<<epoch<<" Global step:"<<global_step<<" Loss"<<epoch_loss<<std::endl;
-                }
-                if (draw_loss_curve) {
-                    loss_vec.push_back(epoch_loss);
-                    draw_curve(board, loss_vec);
-                }
-            }
-            std::cout<<"Training finished"<<std::endl;
-        }else { // 样本大小不等于网络输入层的大小
+        if (layer[0].rows != input.rows) {
+            // 样本大小不等于网络输入层的大小
             std::cout << "Rows of input don't cv::Match the number of input!" << std::endl;
+            return;
         }
         
+        for (int epoch = 1; epoch<=num_epochs; epoch++) {
+            double epoch_loss = 0.f;
+            for (int i = 0; i<input.cols; i++) {
+                layer[0] = input.col(i);
+                target = target_.col(i);
+                forwardPropagation();
+                computeLoss();
+                epoch_loss += loss;
+                backwardPropagation();
+                global_step++;
+            }
+            if (epoch % show_every_n == 0) {
+                std::cout<<"Training epoch:"<<epoch<<" Global step:"<<global_step<<" Loss:"<<epoch_loss<<std::endl;
+            }
+            if (draw_loss_curve) {
+                loss_vec.push_back(epoch_loss);
+                draw_curve(board, loss_vec);
+            }
+        }
+        std::cout<<"Training finished"<<std::endl;
+        
+    }
+    
+    void Net::train_batch(cv::Mat input_, cv::Mat target_, int num_batchs, int num_epochs){
+        if (input_.empty()) {
+            std::cout<<"Error: the dataset is empty"<<std::endl;
+            return;
+        }
+        double temp_loss = 0.f;
+        int global_step = 0;
+        for (int epoch = 1; epoch <= num_epochs; epoch++) {
+            for (int i = 0; i < input_.cols; i++) {
+                layer[0] = input_.col(i);
+                target = target_.col(i);
+                forwardPropagation();
+                computeLoss();
+                global_step++;
+                if ((i+1) % num_batchs == 0) {
+                    temp_loss = loss;
+                    backwardPropagation();
+                }
+            }
+            if (epoch % output_interval == 0) {
+                std::cout<<"Training epoch:"<<epoch<<" Global step:"<<global_step<<" Epoch loss:"<<temp_loss<<std::endl;
+            }
+        }
     }
     
     // 对已经训练完成的模型进行测试并计算准确率
@@ -180,7 +215,7 @@ namespace dongfang {
                 minMaxLoc(target_.col(i), NULL, NULL, NULL, &target_maxLoc, cv::noArray());
                 int target_index = target_maxLoc.y;
                 
-                std::cout << "Test sample:" << i << " Predict:" << predict_index << " Target:" << target_index << std::endl;
+                std::cout << "Test sample:" << i+1 << " Predict:" << predict_index << " Target:" << target_index << std::endl;
                 if (predict_index == target_index) {
                     correct_count++;
                 }
@@ -205,6 +240,7 @@ namespace dongfang {
         if (input.rows == (layer[0].rows) && input.cols == 1) {
             layer[0] = input;
             forwardPropagation();
+            computeLoss();
             cv::Mat layer_out = layer[layer.size() - 1];
             cv::Point predict_maxLoc;
             minMaxLoc(layer_out, NULL, NULL, NULL, &predict_maxLoc, cv::noArray());

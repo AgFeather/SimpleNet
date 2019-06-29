@@ -32,7 +32,7 @@ namespace dongfang
     cv::Mat activationFunction(cv::Mat &x, std::string func_type);
     
     // Objective function
-    void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss);
+    double calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error);
     
     //initialise the weights cv::Matrix.if type =0,Gaussian.else uniform.
     void getRandom(cv::Mat &dst, double begin, double end, std::string type);

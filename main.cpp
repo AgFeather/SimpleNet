@@ -23,13 +23,17 @@ int main(int argc, char *argv[])
     //Set loss threshold,learning rate and activation function
     net.learning_rate = 0.002;
     net.output_interval = 2;
+    float loss_threshold = 20.f;
     net.activation_function = "ReLU";
 
     // 按照loss阈值对模型进行训练
-    //net.train(input, label, 20.0, false);
+    //net.train(input, label, loss_threshold, false);
     
     // 根据epochs进行训练
-    net.train(input, label, 100, false);
+    //net.train(input, label, 100, false);
+    
+    // batch training
+    net.train_batch(input, label);
     
     net.test(test_input, test_label);
 

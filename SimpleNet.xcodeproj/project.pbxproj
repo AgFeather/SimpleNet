@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D661D55D22C79D05004FA172 /* NetUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D661D55B22C79D05004FA172 /* NetUtils.cpp */; };
 		D6A68EB722BCFED9006F5F04 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D6A68EB622BCFED9006F5F04 /* main.cpp */; };
 		D6A68EF622BD01AC006F5F04 /* libopencv_shape.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */; };
 		D6A68EF822BD01AC006F5F04 /* libopencv_imgproc.3.4.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D6A68EE622BD01AB006F5F04 /* libopencv_imgproc.3.4.6.dylib */; };
@@ -33,6 +34,8 @@
 /* Begin PBXFileReference section */
 		D61C031F22BE6C580043879E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D61C033922BE7E940043879E /* data */ = {isa = PBXFileReference; lastKnownFileType = folder; path = data; sourceTree = "<group>"; };
+		D661D55B22C79D05004FA172 /* NetUtils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = NetUtils.cpp; sourceTree = "<group>"; };
+		D661D55C22C79D05004FA172 /* NetUtils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = NetUtils.hpp; sourceTree = "<group>"; };
 		D6A68EB322BCFED9006F5F04 /* SimpleNet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SimpleNet; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6A68EB622BCFED9006F5F04 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		D6A68EE422BD01AB006F5F04 /* libopencv_shape.3.4.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libopencv_shape.3.4.6.dylib; path = "../../opencv/opencv-3.4.6/build/lib/libopencv_shape.3.4.6.dylib"; sourceTree = "<group>"; };
@@ -66,6 +69,8 @@
 		D6A68EAA22BCFED9006F5F04 = {
 			isa = PBXGroup;
 			children = (
+				D661D55B22C79D05004FA172 /* NetUtils.cpp */,
+				D661D55C22C79D05004FA172 /* NetUtils.hpp */,
 				D6A68EB622BCFED9006F5F04 /* main.cpp */,
 				D61C031F22BE6C580043879E /* README.md */,
 				D6A68F0C22BD054B006F5F04 /* csv2xml.cpp */,
@@ -150,6 +155,7 @@
 				D6A68F0B22BD03C7006F5F04 /* Mathematical.cpp in Sources */,
 				D6A68F0822BD0333006F5F04 /* NeuralNet.cpp in Sources */,
 				D6A68EB722BCFED9006F5F04 /* main.cpp in Sources */,
+				D661D55D22C79D05004FA172 /* NetUtils.cpp in Sources */,
 				D6A68F0D22BD054B006F5F04 /* csv2xml.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -55,6 +55,7 @@ namespace dongfang {
         void train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve=false);
         // 训练模型，声明epochs
         void train(cv::Mat input, cv::Mat target_, int num_epochs=50, bool draw_loss_curve=false);
+        void train_batch(cv::Mat input, cv::Mat target_, int num_batchs=200, int num_epochs=100);
         //Test
         double test(cv::Mat &input, cv::Mat &target_);
         //Predict,just one sample
@@ -78,6 +79,8 @@ namespace dongfang {
         void initBiases(cv::Scalar bias);
         // 前向传播
         void forwardPropagation();
+        // 根据模型前向传播的结果计算loss
+        void computeLoss();
         // 反向传播
         void backwardPropagation();
         // 计算每一层的delta error

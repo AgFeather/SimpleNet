@@ -98,16 +98,16 @@ namespace dongfang
     }
     
     // 根据网络输出output和预测目标target计算loss
-    void calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error, float &loss) {
+    double calcLoss(cv::Mat &output, cv::Mat &target, cv::Mat &output_error) {
         if (target.empty()) {
             std::cout << "Can't find the target cv::Matrix" << std::endl;
-            return;
+            return -1;
         }
         output_error = target - output;
         cv::Mat err_sqrare;
         pow(output_error, 2., err_sqrare);
         cv::Scalar err_sqr_sum = sum(err_sqrare);
-        loss = err_sqr_sum[0] / (float)(output.rows);
+        return  err_sqr_sum[0] / (double)(output.rows);
     }
     
 }
