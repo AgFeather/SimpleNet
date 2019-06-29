@@ -14,7 +14,7 @@
 #include <iostream>
 #include<opencv2/core/core.hpp>
 #include<opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc.hpp>
+
 #include<string>
 
 #include "Mathematical.hpp"
@@ -30,7 +30,7 @@ namespace dongfang {
         std::string activation_function = "sigmoid"; // 激活函数
         int num_layers; // 整个神经网络的层数
         int output_interval = 10;
-        float learning_rate;
+        double learning_rate;
         //float accuracy = 0.;
         std::vector<double> loss_vec;
         float fine_tune_factor = 1.01;
@@ -51,6 +51,27 @@ namespace dongfang {
         ~Net() {};
         // 初始化整个神经网络，输入一个vector，表示每一层的神经元个数
         void initNet(std::vector<int> layer_neuron_num_);
+        // 训练模型，使用loss作为阈值
+        void train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve=false);
+        // 训练模型，声明epochs
+        void train(cv::Mat input, cv::Mat target_, int num_epochs=50, bool draw_loss_curve=false);
+        //Test
+        double test(cv::Mat &input, cv::Mat &target_);
+        //Predict,just one sample
+        int predict_one(cv::Mat &input);
+        //Predict,more  than one samples
+        std::vector<int> predict(cv::Mat &input);
+        //Save model;
+        void save(std::string filename);
+        //Load model;
+        void load(std::string filename);
+        
+        double get_learning_rate();
+        void set_learning_rate();
+        
+        
+        
+    private:
         // 初始化权重list
         void initWeights(int type = 0, double a = 0., double b = 0.1);
         // 初始化bias list
@@ -63,34 +84,8 @@ namespace dongfang {
         void calcDeltaError();
         // 更新weight和bias
         void updateParameters();
-        // 训练模型，使用准确率作为阈值
-        void train(cv::Mat input, cv::Mat target, float accuracy_threshold);
-        // 训练模型，使用loss作为阈值
-        void train(cv::Mat input, cv::Mat target_, float loss_threshold, bool draw_loss_curve = false);
-        // 训练模型，声明epochs
-        void train(cv::Mat input, cv::Mat target_, int num_epochs=50, bool draw_loss_curve=false);
-        
-        //Test
-        double test(cv::Mat &input, cv::Mat &target_);
-        
-        //Predict,just one sample
-        int predict_one(cv::Mat &input);
-        
-        //Predict,more  than one samples
-        std::vector<int> predict(cv::Mat &input);
-        
-        //Save model;
-        void save(std::string filename);
-        
-        //Load model;
-        void load(std::string filename);
     };
     
-    //Get sample_number samples in XML file,from the start column.
-    void get_input_label(std::string filename, cv::Mat& input, cv::Mat& label, int sample_num, int start = 0);
-    
-    // Draw loss curve
-    void draw_curve(cv::Mat& board, std::vector<double> points);
 }
 
 #endif /* NeuralNet_hpp */

@@ -41,8 +41,7 @@ namespace dongfang
     }
     
     //sigmoid function
-    cv::Mat sigmoid(cv::Mat &x)
-    {
+    cv::Mat sigmoid(cv::Mat &x) {
         cv::Mat exp_x, fx;
         cv::exp(-x, exp_x);
         fx = 1.0 / (1.0 + exp_x);
@@ -50,8 +49,7 @@ namespace dongfang
     }
     
     //tanh function
-    cv::Mat tanh(cv::Mat &x)
-    {
+    cv::Mat tanh(cv::Mat &x) {
         cv::Mat exp_x_, exp_x, fx;
         cv::exp(-x, exp_x_);
         cv::exp(x, exp_x);
@@ -60,15 +58,11 @@ namespace dongfang
     }
     
     //ReLU function
-    cv::Mat ReLU(cv::Mat &x)
-    {
+    cv::Mat ReLU(cv::Mat &x) {
         cv::Mat fx = x;
-        for (int i = 0; i < fx.rows; i++)
-        {
-            for (int j = 0; j < fx.cols; j++)
-            {
-                if (fx.at<float>(i, j) < 0)
-                {
+        for (int i = 0; i < fx.rows; i++) {
+            for (int j = 0; j < fx.cols; j++) {
+                if (fx.at<float>(i, j) < 0) {
                     fx.at<float>(i, j) = 0;
                 }
             }
